@@ -1,8 +1,10 @@
 package com.example.algamoney.api.Resource;
 
+import com.example.algamoney.api.event.RecursoCriadoEvent;
 import com.example.algamoney.api.model.Categoria;
 import com.example.algamoney.api.repository.CategoriaRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class CategoriaResource {
 
     private CategoriaRepository categoriaRepository;
+    private ApplicationEventPublisher publisher;
 
     @GetMapping
     public List<Categoria> listar() {
@@ -30,19 +33,16 @@ public class CategoriaResource {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
         Categoria categoriaSalva = categoriaRepository.save(categoria);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-                .buildAndExpand(categoriaSalva.getCodigo()).toUri();
-        response.setHeader("Location", uri.toASCIIString());
 
-        return ResponseEntity.created(uri).body(categoriaSalva);
+        publisher.publishEvent(new RecursoCriadoEvent(this,response,categoriaSalva.getCodigo()));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
     }
 
     @GetMapping("/{codigo}")
     public ResponseEntity<Categoria> buscarPeloCodigo(@PathVariable Long codigo) {
         Optional<Categoria> categoria = categoriaRepository.findById(codigo);
-        return categoria.isPresent() ?
-                ResponseEntity.ok(categoria.get()):
-                ResponseEntity.notFound().build();
+        return categoria.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }
