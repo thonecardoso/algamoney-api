@@ -30,6 +30,8 @@ dependencies {
 	compile "org.flywaydb:flyway-core:7.7.1"
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.4.3'
 
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
 //	compile group: 'org.hibernate', name: 'hibernate-java8', version: '5.4.6.Final'
 //	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
 

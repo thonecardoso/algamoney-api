@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -19,24 +20,31 @@ public class Lancamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
+    @NotNull
     private String descricao;
 
-    @Column(name = "data_vencimento")
+    @NotNull
+    @Column
     private LocalDate dataVencimento;
 
-    @Column(name = "data_pagamento")
+    @Column
     private LocalDate dataPagamento;
+
+    @NotNull
     private BigDecimal valor;
     private String observacao;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo")
     private TipoLancamento tipoLancamento;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "codigo_categoria")
     private Categoria categoria;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "codigo_pessoa")
     private Pessoa pessoa;

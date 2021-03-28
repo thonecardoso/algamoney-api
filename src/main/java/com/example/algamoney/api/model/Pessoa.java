@@ -1,6 +1,7 @@
 package com.example.algamoney.api.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -25,4 +26,10 @@ public class Pessoa {
 
     @NotNull
     private boolean ativo;
+
+    @JsonIgnore
+    @Transient
+    public boolean isInativo(){
+        return !this.ativo;
+    }
 }
