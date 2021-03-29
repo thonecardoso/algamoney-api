@@ -8,11 +8,11 @@ import com.example.algamoney.api.repository.filter.LancamentoFilter;
 import com.example.algamoney.api.service.LancamentoService;
 import com.example.algamoney.api.service.exception.PessoaInexistenteOuInativaException;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpHeaders;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,21 +35,21 @@ public class LancamentoResource {
     private final MessageSource messageSource;
 
     @GetMapping
-    public List<Lancamento> pesquisar(LancamentoFilter lancamentoFilter){
-        return lancamentoRepository.filtrar(lancamentoFilter);
+    public Page<Lancamento> pesquisar(LancamentoFilter lancamentoFilter, Pageable Pageable){
+        return lancamentoRepository.filtrar(lancamentoFilter, Pageable);
     }
 
     @GetMapping("/{codigo}")
-    public ResponseEntity<Lancamento> buscaPeloCodigo(@PathVariable Long codigo){
+    public ResponseEntity<Lancamento> buscaPeloCodigo(@PathVariable Long codigo) {
         Optional<Lancamento> lancamentoOptional = lancamentoRepository.findById(codigo);
-        return lancamentoOptional.map(ResponseEntity::ok).orElseGet(()->ResponseEntity.notFound().build());
+        return lancamentoOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response){
+    public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento, HttpServletResponse response) {
         Lancamento lancamentoSalvo = lancamentoService.salvar(lancamento);
-        publisher.publishEvent(new RecursoCriadoEvent(this,response,lancamentoSalvo.getCodigo()));
+        publisher.publishEvent(new RecursoCriadoEvent(this, response, lancamentoSalvo.getCodigo()));
         return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoSalvo);
     }
 
@@ -62,5 +62,11 @@ public class LancamentoResource {
         String mensagemDesenvolvedor = ex.toString();
         List<AlgamoneyExceptionHandler.Erro> erros = Arrays.asList(new AlgamoneyExceptionHandler.Erro(mensagemUsuario, mensagemDesenvolvedor));
         return ResponseEntity.badRequest().body(erros);
+    }
+
+    @DeleteMapping("/{codigo}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable Long codigo){
+        lancamentoRepository.deleteById(codigo);
     }
 }
