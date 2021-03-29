@@ -3,6 +3,7 @@ package com.example.algamoney.api.model;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -24,10 +25,10 @@ public class Lancamento {
     private String descricao;
 
     @NotNull
-    @Column
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataVencimento;
 
-    @Column
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataPagamento;
 
     @NotNull

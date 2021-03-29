@@ -32,10 +32,33 @@ dependencies {
 
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
 
+	//https://stackoverflow.com/questions/54218556/how-to-generate-jpa-metamodel-with-gradle-5-x
+	annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.30.Final')
+
+
 //	compile group: 'org.hibernate', name: 'hibernate-java8', version: '5.4.6.Final'
 //	implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.1'
 
 }
+
+tasks.withType(JavaCompile) {
+	options.annotationProcessorGeneratedSourcesDirectory = file("src/generated/java")
+}
+
+
+//sourceSets {
+//	generated {
+//		java {
+//			srcDirs = ['src/generated/java']
+//		}
+//	}
+//}
+
+//https://stackoverflow.com/questions/47817079/jpa-static-metamodel-not-recognized-by-intellij
+sourceSets {
+	main.java.srcDirs += 'build/generated/source/apt/main'
+}
+
 
 test {
 	useJUnitPlatform()
